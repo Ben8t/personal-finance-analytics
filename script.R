@@ -1,6 +1,7 @@
 library(tidyverse)
 library(readr)
 library(lubridate)
+library(ggdist)
 
 # https://github.com/Z3tt/TidyTuesday/tree/master/plots/2020_31
 # https://github.com/z3tt/TidyTuesday/blob/master/R/2020_31_PalmerPenguins.Rmd
@@ -54,3 +55,18 @@ ggplot(agg_month_expense_daily, aes(x=sum_price, y=YearMonth, fill=reorder(Tag1,
     scale_x_continuous(breaks=c(-5000, -2500, -1250, -1000, -750, -500, -250, -100, 0, 100, 250, 500, 750, 1000, 1250, 2500)) +
     labs(title="Monthly expenses",y="", x="", fill="Categories") + 
     custom_theme() 
+
+
+agg_month_expenses <- agg_month %>% 
+    mutate(sum_price = ifelse(sum_price < 0, -sum_price, sum_price))
+
+expenses_filtered <- agg_month_expenses %>%
+    filter(YearMonth == "2021-05")
+    
+
+ggplot(expenses_filtered) + geom_bar(aes(x=sum_price, y=reorder(Tag1, sum_price), fill=Tag1), stat="identity") + 
+    scale_x_reverse() +
+    geom_point(aes(x=sum_price, y=reorder(Tag1, sum_price)), shape=18, size=3) +
+    geom_text(aes(x=sum_price, y=reorder(Tag1, sum_price), label=paste0(sum_price, "€")), hjust=1.3) +
+    coord_cartesian(clip = "off") +
+    custom_theme()
