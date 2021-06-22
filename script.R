@@ -11,18 +11,21 @@ library(ggbeeswarm)
 # https://evamaerey.github.io/ggplot2_grammar_guide/geoms_continuous_distribution.html#53
 # https://evamaerey.github.io/ggplot2_grammar_guide/geoms_continuous_distribution.html#64
 # https://stackoverflow.com/questions/15720545/use-stat-summary-to-annotate-plot-with-number-of-observations
+# https://evamaerey.github.io/ggplot2_grammar_guide/geoms_discrete_discrete.html#31
 
 custom_theme <- function(){
   list(
     theme(plot.margin=unit(c(1,2,1,1), "cm")),
     theme(
-      panel.grid.minor=element_line(color="#DCDCDC"),
-      panel.grid.major=element_line(color="#DCDCDC"),
+      panel.grid.minor=element_blank(),
+      panel.grid.major=element_line(color="#DCDCDC", linetype="dashed"),
+      panel.grid.major.y=element_blank(),
       panel.border=element_blank(),
       panel.background=element_blank(),
       axis.ticks=element_line(),
       axis.line.x=element_line(size=0.2, linetype="solid", colour="black"),
-      axis.line.y=element_line(size=0.2, linetype="solid", colour="black"),
+      axis.line.y=element_blank(),
+      axis.ticks.y=element_blank(),
       axis.text.x=element_text(size=8, angle=45, vjust = 0.5), 
       axis.text.y=element_text(size=8),
       axis.title.x=element_text(size=10),
@@ -85,10 +88,17 @@ ggplot(data) +
     coord_cartesian(xlim=c(-100,100))
 
 
-ggplot(
-    data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price)), 
-    aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1)
-    ) + 
-    geom_dots(size=2.5, stackratio=5) +
-    stat_summary(fun="mean", fun.min=min, fun.max=max, color="black", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
+FILTER_MONTH <- "2021-04"
+ggplot(data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price))) + 
+    geom_dots(aes(x=sum_price, y=reorder(Tag1, -sum_price)), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
+    stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="#8d8d8d", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
+    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.3), color="#8d8d8d") +
+    geom_dots(data = . %>% filter(YearMonth==FILTER_MONTH), aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1) +
+    geom_label(data = .%>% filter(YearMonth==FILTER_MONTH), aes(x=sum_price, y=Tag1, label=paste0(round(sum_price, digits=0), "€"), color=Tag1), nudge_y=0.3, size=3) +
+    scale_x_continuous(breaks=c(-5000, -2500, -1250, -1000, -750, -500, -250, 0, 250, 500, 750, 1000, 1250, 2500)) +
+    #coord_cartesian(xlim=c(-800,800), clip="on") +
+    labs(title=paste0(FILTER_MONTH, " expenses"), x="€", y="", fill="", color="") +
+    theme(legend.position="none") +
     custom_theme()
+
+
