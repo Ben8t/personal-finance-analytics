@@ -89,6 +89,7 @@ ggplot(data) +
 
 
 FILTER_MONTH <- "2021-04"
+plot_data <- data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price))
 ggplot(data=plot_data) + 
     geom_vline(xintercept=0,linetype = "dashed", color="black") +
     geom_dots(aes(x=sum_price, y=reorder(Tag1, -sum_price)), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
@@ -104,3 +105,18 @@ ggplot(data=plot_data) +
     custom_theme()
 
 
+legend_data <- tibble(sum_price=c(-280, -275, -200, -103, -450, -35, 54, 12), Tag1="CATEGORY") %>%
+    mutate(YearMonth=ifelse(sum_price==-200, "MONTH", "OTHERS"))
+
+ggplot(legend_data) + 
+    geom_dots(aes(x=sum_price, y=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
+    stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="#8d8d8d", shape=18, size=0.5, position=position_nudge(y=-0.01)) +
+    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.1), color="#8d8d8d") +
+    geom_dots(data = . %>% filter(YearMonth=="MONTH"), aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1) +
+    geom_label(data = .%>% filter(YearMonth=="MONTH"), aes(x=sum_price, y=Tag1, label=paste0(round(sum_price, digits=0), "€"), color=Tag1), nudge_y=0.1, size=3) +
+    annotate(x=-290, y=1.2, label="Month expense", geom="text") +
+    annotate(geom = "curve", curvature =  -.3, x = -250, xend = -205, y = 1.2, yend = 1.15) +
+    annotate(x=-65, y=0.8, label="Overall median", geom="text") +
+    annotate(geom = "curve", curvature =  -.3, x = -102, xend = -150, y = 0.8, yend = 0.86) +
+    theme_void() +
+    theme(legend.position="none")
