@@ -2,9 +2,15 @@ library(tidyverse)
 library(readr)
 library(lubridate)
 library(ggdist)
+library(ggbeeswarm)
 
 # https://github.com/Z3tt/TidyTuesday/tree/master/plots/2020_31
 # https://github.com/z3tt/TidyTuesday/blob/master/R/2020_31_PalmerPenguins.Rmd
+# https://stackoverflow.com/questions/15720545/use-stat-summary-to-annotate-plot-with-number-of-observations
+# https://evamaerey.github.io/ggplot2_grammar_guide/geoms_continuous_distribution.html#51
+# https://evamaerey.github.io/ggplot2_grammar_guide/geoms_continuous_distribution.html#53
+# https://evamaerey.github.io/ggplot2_grammar_guide/geoms_continuous_distribution.html#64
+# https://stackoverflow.com/questions/15720545/use-stat-summary-to-annotate-plot-with-number-of-observations
 
 custom_theme <- function(){
   list(
@@ -69,4 +75,20 @@ ggplot(expenses_filtered) + geom_bar(aes(x=sum_price, y=reorder(Tag1, sum_price)
     geom_point(aes(x=sum_price, y=reorder(Tag1, sum_price)), shape=18, size=3) +
     geom_text(aes(x=sum_price, y=reorder(Tag1, sum_price), label=paste0(sum_price, "€")), hjust=1.3) +
     coord_cartesian(clip = "off") +
+    custom_theme()
+
+
+ggplot(data) + 
+    geom_dots(aes(x=Price, y=Tag1, color=Tag1, fill=Tag1), size=1, stackratio=1, binwidth=1) +
+    gghighlight(YearMonth == "2021-05") +
+    custom_theme() + 
+    coord_cartesian(xlim=c(-100,100))
+
+
+ggplot(
+    data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price)), 
+    aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1)
+    ) + 
+    geom_dots(size=2.5, stackratio=5) +
+    stat_summary(fun="mean", fun.min=min, fun.max=max, color="black", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
     custom_theme()
