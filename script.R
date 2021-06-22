@@ -27,7 +27,7 @@ custom_theme <- function(){
       axis.line.y=element_blank(),
       axis.ticks.y=element_blank(),
       axis.text.x=element_text(size=8, angle=45, vjust = 0.5), 
-      axis.text.y=element_text(size=8),
+      axis.text.y=element_blank(),
       axis.title.x=element_text(size=10),
       axis.title.y=element_text(size=10),
       legend.title=element_text(size=10),
@@ -90,9 +90,11 @@ ggplot(data) +
 
 FILTER_MONTH <- "2021-04"
 ggplot(data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price))) + 
+    geom_vline(xintercept=0,linetype = "dashed", color="black") +
     geom_dots(aes(x=sum_price, y=reorder(Tag1, -sum_price)), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
     stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="#8d8d8d", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
     geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.3), color="#8d8d8d") +
+    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(min_price=min(sum_price)) %>% ungroup(), aes(x=min_price, y=Tag1, label=paste0(Tag1), color=Tag1), size=3, nudge_x=-500, fontface = "bold") +
     geom_dots(data = . %>% filter(YearMonth==FILTER_MONTH), aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1) +
     geom_label(data = .%>% filter(YearMonth==FILTER_MONTH), aes(x=sum_price, y=Tag1, label=paste0(round(sum_price, digits=0), "€"), color=Tag1), nudge_y=0.3, size=3) +
     scale_x_continuous(breaks=c(-5000, -2500, -1250, -1000, -750, -500, -250, 0, 250, 500, 750, 1000, 1250, 2500)) +
