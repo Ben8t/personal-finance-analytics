@@ -89,7 +89,7 @@ ggplot(data) +
 
 
 FILTER_MONTH <- "2021-04"
-ggplot(data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price))) + 
+ggplot(data=plot_data) + 
     geom_vline(xintercept=0,linetype = "dashed", color="black") +
     geom_dots(aes(x=sum_price, y=reorder(Tag1, -sum_price)), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
     stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="#8d8d8d", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
