@@ -3,7 +3,12 @@ library(readr)
 library(lubridate)
 library(ggdist)
 library(ggbeeswarm)
+library(cowplot)
+library(ggdraw)
+library(ggtext)
+library(glue)
 
+source(file="src/plot.R")
 # https://github.com/Z3tt/TidyTuesday/tree/master/plots/2020_31
 # https://github.com/z3tt/TidyTuesday/blob/master/R/2020_31_PalmerPenguins.Rmd
 # https://stackoverflow.com/questions/15720545/use-stat-summary-to-annotate-plot-with-number-of-observations
@@ -12,31 +17,6 @@ library(ggbeeswarm)
 # https://evamaerey.github.io/ggplot2_grammar_guide/geoms_continuous_distribution.html#64
 # https://stackoverflow.com/questions/15720545/use-stat-summary-to-annotate-plot-with-number-of-observations
 # https://evamaerey.github.io/ggplot2_grammar_guide/geoms_discrete_discrete.html#31
-
-custom_theme <- function(){
-  list(
-    theme(plot.margin=unit(c(1,2,1,1), "cm")),
-    theme(
-      panel.grid.minor=element_blank(),
-      panel.grid.major=element_line(color="#DCDCDC", linetype="dashed"),
-      panel.grid.major.y=element_blank(),
-      panel.border=element_blank(),
-      panel.background=element_blank(),
-      axis.ticks=element_line(),
-      axis.line.x=element_line(size=0.2, linetype="solid", colour="black"),
-      axis.line.y=element_blank(),
-      axis.ticks.y=element_blank(),
-      axis.text.x=element_text(size=8, angle=45, vjust = 0.5), 
-      axis.text.y=element_blank(),
-      axis.title.x=element_text(size=10),
-      axis.title.y=element_text(size=10),
-      legend.title=element_text(size=10),
-      legend.text=element_text(size=10),
-      plot.title=element_text(size=25)
-    ),
-    theme(text=element_text(family="Object Sans", face="bold", size=8))
-  )
-}
 
 
 data <- read_csv("data/data.csv") %>%
@@ -88,35 +68,52 @@ ggplot(data) +
     coord_cartesian(xlim=c(-100,100))
 
 
-FILTER_MONTH <- "2021-04"
+FILTER_MONTH <- "2021-05"
+PARSED_FILTER_DATE <- parse_date_time(FILTER_MONTH, "ym")
+FILTER_MONTH_LABEL <- glue("{month(ymd(PARSED_FILTER_DATE), label = TRUE, abbr = FALSE)} {year(ymd(PARSED_FILTER_DATE))}")
 plot_data <- data %>% group_by(YearMonth, Tag1) %>% summarise(sum_price=sum(Price))
-ggplot(data=plot_data) + 
-    geom_vline(xintercept=0,linetype = "dashed", color="black") +
-    geom_dots(aes(x=sum_price, y=reorder(Tag1, -sum_price)), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
-    stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="#8d8d8d", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
-    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.3), color="#8d8d8d") +
+total_expense <- plot_data %>% filter(YearMonth==FILTER_MONTH) %>% filter(!(Tag1 %in% c("EPARGNE", "RESOURCE"))) %>% pull(sum_price) %>% sum()
+plot_expense <- ggplot(data=plot_data) + 
+    # geom_vline(xintercept=0, color="grey", linetype="dashed") +
+    geom_dots(aes(x=sum_price, y=reorder(Tag1, -sum_price), alpha=YearMonth), size=2.5, stackratio=5, binwidth=1, color="grey") +
+    stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="grey", shape=18, size=0.5, position=position_nudge(y=-0.1)) +
+    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.3), color="grey") +
     geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(min_price=min(sum_price)) %>% ungroup(), aes(x=min_price, y=Tag1, label=paste0(Tag1), color=Tag1), size=3, nudge_x=-500, fontface = "bold") +
     geom_dots(data = . %>% filter(YearMonth==FILTER_MONTH), aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1) +
     geom_label(data = .%>% filter(YearMonth==FILTER_MONTH), aes(x=sum_price, y=Tag1, label=paste0(round(sum_price, digits=0), "€"), color=Tag1), nudge_y=0.3, size=3) +
-    scale_x_continuous(breaks=c(-5000, -2500, -1250, -1000, -750, -500, -250, 0, 250, 500, 750, 1000, 1250, 2500)) +
+    scale_x_continuous(breaks=c(-2500, -1250, -1000, -750, -500, -250, 0, 250, 500, 750, 1000, 1250, 2500)) +
     #coord_cartesian(xlim=c(-800,800), clip="on") +
-    labs(title=paste0(FILTER_MONTH, " expenses"), x="€", y="", fill="", color="") +
+    labs(
+        title=paste0("Monthly expenses ", FILTER_MONTH_LABEL), 
+        subtitle=glue("Total expenses<sup>1</sup> : {total_expense} €"), 
+        x="€", y="", fill="", color="") +
     theme(legend.position="none") +
+    annotate(geom = "text",  
+           x = -4000, y = 1,  
+           label = "1: All expenses without EPARGNE and RESOURCE tags.",  
+           hjust = 1, size = 2.5,   
+           fontface = "italic",  
+           color = "grey") +
+    coord_cartesian(clip="off") +
     custom_theme()
 
 
 legend_data <- tibble(sum_price=c(-280, -275, -200, -103, -450, -35, 54, 12), Tag1="CATEGORY") %>%
     mutate(YearMonth=ifelse(sum_price==-200, "MONTH", "OTHERS"))
 
-ggplot(legend_data) + 
-    geom_dots(aes(x=sum_price, y=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1, color="#8d8d8d") +
-    stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="#8d8d8d", shape=18, size=0.5, position=position_nudge(y=-0.01)) +
-    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.1), color="#8d8d8d") +
+legend_plot <- ggplot(legend_data) + 
+    geom_dots(aes(x=sum_price, y=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1, color="grey") +
+    stat_summary(aes(x=sum_price, y=Tag1), fun="median", fun.min=min, fun.max=max, color="grey", shape=18, size=0.5, position=position_nudge(y=-0.01)) +
+    geom_text(data=. %>% ungroup() %>% group_by(Tag1) %>% summarise(mean_price=median(sum_price)) %>% ungroup(), aes(x=mean_price, y=Tag1, label=paste0(round(mean_price, digits=0), "€")), size=3, position=position_nudge(y=-0.05), color="grey") +
     geom_dots(data = . %>% filter(YearMonth=="MONTH"), aes(x=sum_price, y=Tag1, color=Tag1, fill=Tag1), size=2.5, stackratio=5, binwidth=1) +
-    geom_label(data = .%>% filter(YearMonth=="MONTH"), aes(x=sum_price, y=Tag1, label=paste0(round(sum_price, digits=0), "€"), color=Tag1), nudge_y=0.1, size=3) +
-    annotate(x=-290, y=1.2, label="Month expense", geom="text") +
-    annotate(geom = "curve", curvature =  -.3, x = -250, xend = -205, y = 1.2, yend = 1.15) +
-    annotate(x=-65, y=0.8, label="Overall median", geom="text") +
-    annotate(geom = "curve", curvature =  -.3, x = -102, xend = -150, y = 0.8, yend = 0.86) +
+    geom_label(data = .%>% filter(YearMonth=="MONTH"), aes(x=sum_price, y=Tag1, label=paste0(round(sum_price, digits=0), "€"), color=Tag1), nudge_y=0.05, size=3) +
+    annotate(x=-425, y=1.1, label="Month expense", geom="text", color="grey", size=3) +
+    annotate(geom = "curve", curvature =  -.3, x = -320, xend = -205, y = 1.1, yend = 1.08, arrow = arrow(length=unit(0.2,"cm"), type = "closed"), color="grey") +
+    annotate(x=20, y=0.902, label="Overall median", geom="text", color="grey", size=3) +
+    annotate(geom = "curve", curvature =  -.3, x = -80, xend = -145, y = 0.9, yend = 0.925, arrow = arrow(length=unit(0.2,"cm"), type = "closed"), color="grey") +
     theme_void() +
+    coord_cartesian(clip="off") +
     theme(legend.position="none")
+
+main_plot <- ggdraw() + draw_plot(plot_expense) + draw_plot(legend_plot, x=0.08, y=-0.1, width=0.2)
+main_plot + ggsave("test.png", bg="white", width = 32, height = 25, units = "cm", dpi = 300)
