@@ -3,4 +3,4 @@
 Analyse personal finance through ggplot graphics.
 
 
-![](img/monthly-expense-2021-05.png)
+![](plot/img/monthly-expense-2021-05.png)

@@ -6,7 +6,7 @@ library(cowplot)
 library(ggtext)
 library(glue)
 
-source(file="src/plot.R")
+source(file="plot/R/theme.R")
 
 data <- read_csv("data/data.csv") %>%
     mutate(Month=month(dmy(Date), label=TRUE), Year=year(dmy(Date)), YearMonth=format(dmy(Date), "%Y-%m")) %>%
@@ -61,4 +61,4 @@ legend_plot <- ggplot(legend_data) +
     theme(legend.position="none")
 
 main_plot <- ggdraw() + draw_plot(expense_plot) + draw_plot(legend_plot, x=0.08, y=-0.1, width=0.2)
-main_plot + ggsave(glue("img/monthly-expense-{FILTER_MONTH}.png"), bg="white", width=32, height=25, units="cm", dpi=300)
+main_plot + ggsave(glue("plot/img/monthly-expense-{FILTER_MONTH}.png"), bg="white", width=32, height=25, units="cm", dpi=300)
