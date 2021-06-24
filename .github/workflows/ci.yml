@@ -10,16 +10,15 @@ on:
         - develop
 
 jobs:
-  hello_world_job:
+  main:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: Build Docker image, download data, run scripts
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Hello world action step
-        id: hello
-        uses: ./
+      - name: Create Monthly Expense plot
+        uses: ./  # using private root action
         with:
           script: 'plot/R/monthly_expense.R'
 
