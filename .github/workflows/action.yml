@@ -19,14 +19,14 @@ jobs:
           r-version: '4.0.3'
       - name: Install R packages
         run: |
-          RUN R -e "install.packages('tidyverse', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          RUN R -e "install.packages('lubridate', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          RUN R -e "install.packages('ggdist', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          RUN R -e "install.packages('ggtext', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN Rscript -e "install.packages('tidyverse', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN Rscript -e "install.packages('lubridate', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN Rscript -e "install.packages('ggdist', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN Rscript -e "install.packages('ggtext', dependencies=TRUE, repos='http://cran.rstudio.com/')"
       
       - name: Test packages
         run: |
-          RUN R -e "library(tidyverse)"
-          RUN R -e "library(lubridate)"
-          RUN R -e "library(ggdist)"
-          RUN R -e "library(ggtext)"
+          RUN Rscript -e "library(tidyverse)"
+          RUN Rscript -e "library(lubridate)"
+          RUN Rscript -e "library(ggdist)"
+          RUN Rscript -e "library(ggtext)"
