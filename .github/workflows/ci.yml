@@ -19,7 +19,7 @@ jobs:
           r-version: '4.0.3'
       - name: Install R packages
         run: |
-          apt-get install libcurl4-openssl-dev -y
+          sudo apt-get install libcurl4-openssl-dev -y
           Rscript -e "install.packages('readr', dependencies=TRUE, repos='http://cran.rstudio.com/')"
           Rscript -e "install.packages('dplyr', dependencies=TRUE, repos='http://cran.rstudio.com/')"
           Rscript -e "install.packages('glue', dependencies=TRUE, repos='http://cran.rstudio.com/')"
@@ -39,4 +39,8 @@ jobs:
           Rscript -e "library(cowplot)"
           Rscript -e "library(ggtext)"
           Rscript -e "library(glue)"
+
+      - name: Run Montlhy Expense script
+        run: |
+          Rscript -e "source(file='plot/R/monthly_expense.R')"
 
