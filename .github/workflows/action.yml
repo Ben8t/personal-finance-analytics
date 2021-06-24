@@ -10,11 +10,23 @@ on:
         - develop
 
 jobs:
-  build:
+  main:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - uses: r-lib/actions/setup-r@v1
         with:
-          r-version: '4.0.3' # The R version to download (if necessary) and use.
-      - run: Rscript -e 'print("hello")'
+          r-version: '4.0.3'
+      - name: Install R packages
+        run: |
+          RUN R -e "install.packages('tidyverse', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN R -e "install.packages('lubridate', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN R -e "install.packages('ggdist', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+          RUN R -e "install.packages('ggtext', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+      
+      - name: Test packages
+        run: |
+          RUN R -e "library(tidyverse)"
+          RUN R -e "library(lubridate)"
+          RUN R -e "library(ggdist)"
+          RUN R -e "library(ggtext)"
