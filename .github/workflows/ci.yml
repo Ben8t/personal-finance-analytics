@@ -10,37 +10,13 @@ on:
         - develop
 
 jobs:
-  main:
+  hello_world_job:
     runs-on: ubuntu-latest
+    name: A job to say hello
     steps:
-      - uses: actions/checkout@master
-      - uses: r-lib/actions/setup-r@v1
+      - name: Hello world action step
+        id: hello
+        uses: actions/personal-finance-analytics@v1
         with:
-          r-version: '4.0.3'
-      - name: Install R packages
-        run: |
-          sudo apt-get install libcurl4-openssl-dev -y
-          Rscript -e "install.packages('readr', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('dplyr', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('glue', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('ggplot2', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('cowplot', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('lubridate', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('ggdist', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-          Rscript -e "install.packages('ggtext', dependencies=TRUE, repos='http://cran.rstudio.com/')"
-      
-      - name: Test packages
-        run: |
-          Rscript -e "library(dplyr)"
-          Rscript -e "library(ggplot2)"
-          Rscript -e "library(readr)"
-          Rscript -e "library(lubridate)"
-          Rscript -e "library(ggdist)"
-          Rscript -e "library(cowplot)"
-          Rscript -e "library(ggtext)"
-          Rscript -e "library(glue)"
-
-      - name: Run Montlhy Expense script
-        run: |
-          Rscript -e "source(file='plot/R/monthly_expense.R')"
+          script: 'plot/R/monthly_expense.R'
 

@@ -1,0 +1,16 @@
+# action.yml
+name: 'R'
+description: 'Using R & packages'
+inputs:
+  script:  # id of input
+    description: 'Script to run'
+    required: true
+    default: 'None'
+# outputs:
+#   time: # id of output
+#     description: 'The time we greeted you'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.script }}
