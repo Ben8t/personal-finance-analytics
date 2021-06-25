@@ -40,6 +40,8 @@ response <- POST(
     base_url, add_headers("Authorization"=glue('Bearer {notion_api_secret}'), "Notion-Version"="2021-05-13", "Content-Type"="application/json"), 
     body = '{"page_size": 50}'
 )
+
+print(content(response))
 result_dataframe <- tibble(
   Date = character(),
   Name = character(),
