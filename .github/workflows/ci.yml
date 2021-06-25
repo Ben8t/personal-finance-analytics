@@ -22,6 +22,8 @@ jobs:
           mkdir -p data
       
       - name: Download Data
+        env:
+            NOTION_API_SECRET: ${{ secrets.NOTION_API_SECRET }}
         uses: ./ # using private root action
         with:
           script: 'download_data.R'
