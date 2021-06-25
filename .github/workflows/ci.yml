@@ -17,8 +17,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Download Data
+        uses: ./ # using private root action
+        with:
+          script: 'download_data.R'
+      
       - name: Create Monthly Expense plot
         uses: ./  # using private root action
         with:
           script: 'plot/R/monthly_expense.R'
-

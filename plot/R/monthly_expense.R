@@ -15,7 +15,7 @@ data <- read_csv("data/toto.csv") %>%
     filter(Price > -5000)
 
 
-FILTER_MONTH <- "2021-05"
+FILTER_MONTH <- "2021-04"
 PARSED_FILTER_DATE <- parse_date_time(FILTER_MONTH, "ym")
 FILTER_MONTH_LABEL <- glue("{month(ymd(PARSED_FILTER_DATE), label=TRUE, abbr=FALSE)} {year(ymd(PARSED_FILTER_DATE))}")
 
