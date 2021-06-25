@@ -9,8 +9,8 @@ library(glue)
 
 source(file="plot/R/theme.R")
 
-data <- read_csv("data/data.csv") %>%
-    mutate(Month=month(dmy(Date), label=TRUE), Year=year(dmy(Date)), YearMonth=format(dmy(Date), "%Y-%m")) %>%
+data <- read_csv("data/toto.csv") %>%
+    mutate(Month=month(ymd(Date), label=TRUE), Year=year(ymd(Date)), YearMonth=format(ymd(Date), "%Y-%m")) %>%
     filter(Tag1 != "COMPTE") %>%
     filter(Price > -5000)
 
