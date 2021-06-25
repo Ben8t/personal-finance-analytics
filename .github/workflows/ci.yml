@@ -17,6 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Create ./data directory
+        run: |
+          mkdir -p data
+      
       - name: Download Data
         uses: ./ # using private root action
         with:
