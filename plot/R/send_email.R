@@ -1,3 +1,4 @@
+library(glue)
 library(keyring)
 library(blastula)
 source(file="plot/R/date.R")
