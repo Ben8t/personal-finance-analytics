@@ -7,7 +7,9 @@ library(cowplot)
 library(ggtext)
 library(glue)
 
+
 source(file="plot/R/theme.R")
+source(file="plot/R/date.R")
 
 data <- read_csv("data/data.csv") %>%
     mutate(Month=month(ymd(Date), label=TRUE), Year=year(ymd(Date)), YearMonth=format(ymd(Date), "%Y-%m")) %>%
@@ -15,7 +17,7 @@ data <- read_csv("data/data.csv") %>%
     filter(Price > -5000)
 
 
-FILTER_MONTH <- "2021-04"
+FILTER_MONTH <- find_last_month_year()
 PARSED_FILTER_DATE <- parse_date_time(FILTER_MONTH, "ym")
 FILTER_MONTH_LABEL <- glue("{month(ymd(PARSED_FILTER_DATE), label=TRUE, abbr=FALSE)} {year(ymd(PARSED_FILTER_DATE))}")
 
