@@ -3,7 +3,7 @@ FROM rocker/tidyverse
 RUN mkdir -p /home/user/.rstudio/monitored/user-settings/
 
 RUN apt-get update &&  \
-    apt-get install -y libmagick++-dev \
+    apt-get install -y libmagick++-dev && \
     apt-get install -y libsodium-dev
 
 
