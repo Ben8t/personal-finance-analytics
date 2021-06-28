@@ -32,3 +32,12 @@ jobs:
         uses: ./  # using private root action
         with:
           script: 'plot/R/monthly_expense.R'
+
+      - name: Send email
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          RECEIVER: pimpaudben@gmail.com
+        uses: ./  # using private root action
+        with:
+          script: 'plot/R/send_email.R'
