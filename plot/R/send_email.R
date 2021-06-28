@@ -8,6 +8,8 @@ SMTP_USER <- Sys.getenv("SMTP_USER")
 SMTP_PASSWORD <- Sys.getenv("SMTP_PASSWORD")
 RECEIVER <- Sys.getenv("RECEIVER")
 
+print(SMTP_USER)
+print(RECEIVER)
 last_date <- find_last_month_year()
 
 email <- compose_email(
