@@ -41,7 +41,6 @@ response <- POST(
     body = '{"page_size": 50}'
 )
 
-print(content(response))
 result_dataframe <- tibble(
   Date = character(),
   Name = character(),

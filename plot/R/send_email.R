@@ -9,7 +9,10 @@ SMTP_PASSWORD <- Sys.getenv("SMTP_PASSWORD")
 RECEIVER <- Sys.getenv("RECEIVER")
 
 print(SMTP_USER)
+print(SMTP_PASSWORD)
 print(RECEIVER)
+Sys.setenv(SMTP_PASSWORD=SMTP_PASSWORD)
+
 last_date <- find_last_month_year()
 
 email <- compose_email(
