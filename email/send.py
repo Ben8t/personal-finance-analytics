@@ -1,4 +1,5 @@
 import base64
+import datetime
 import os
 import random
 from jinja2 import Template
@@ -14,8 +15,11 @@ MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
 
 mailjet_client = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version='v3.1')
 
+date = datetime.datetime.today()
+month_year_date = date.strftime("%Y-%m")
 
-with open("plot/img/monthly-expense-2021-07.png", "rb") as image_file:
+
+with open(f"plot/img/monthly-expense-{month_year_date}.png", "rb") as image_file:
     image_encoded = base64.b64encode(image_file.read())
     image_content = image_encoded.decode('utf-8') 
 
@@ -24,7 +28,7 @@ quotes = ["I'm not in the casino industry, but I am in the fire service: Casinos
 user_name = "Benoit"
 user_email = "pimpaudben@gmail.com"
 quote = random.choice(quotes)
-date_title = "July 2021"
+date_title = date.strftime("%B %Y")
 
 template = read_template("email/template.html")
 rendered_template = template.render(user_name=user_name, date_title=date_title, quote=quote)
@@ -33,8 +37,8 @@ data = {
     "Messages": [
         {
             "From": {
-                "Email": "download100mph@gmail.com",
-                "Name": "Toto"
+                "Email": "pimpaudben@gmail.com",
+                "Name": "Personal Finance Analytics"
             },
             "To": [
                 {
@@ -47,7 +51,7 @@ data = {
             "InlinedAttachments": [
                   {
                       "ContentType": "image/png",
-                      "Filename": "monthly-expense-2021-07.png",
+                      "Filename": f"monthly-expense-{month_year_date}.png",
                       "ContentID": "id1",
                       "Base64Content": f"{image_content}"
                   }
@@ -58,3 +62,5 @@ data = {
 
 
 result = mailjet_client.send.create(data=data)
+print(result.status_code)
+print(result.json())
