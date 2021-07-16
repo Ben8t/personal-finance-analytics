@@ -33,11 +33,15 @@ jobs:
         with:
           script: 'plot/R/monthly_expense.R'
 
-      - name: Send email
-        env:
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          RECEIVER: 'pimpaudben@gmail.com'
-        uses: ./  # using private root action
+      - name: Setup python
+        uses: actions/setup-python@v2
         with:
-          script: 'plot/R/send_email.R'
+          python-version: 3.8
+
+      - name: Send mail
+        env:
+          MAILJET_USER: ${{ secrets.MAILJET_USER }}
+          MAILJET_CREDENTIAL: ${{ secrets.MAILJET_CREDENTIAL }}
+        run: |
+          pip install mailjet_rest
+          python email/send.py
