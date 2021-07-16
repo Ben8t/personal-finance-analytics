@@ -40,8 +40,8 @@ jobs:
 
       - name: Send mail
         env:
-          MAILJET_USER: ${{ secrets.MAILJET_USER }}
-          MAILJET_CREDENTIAL: ${{ secrets.MAILJET_CREDENTIAL }}
+          MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
+          MAILJET_API_SECRET: ${{ secrets.MAILJET_API_SECRET }}
         run: |
           pip install mailjet_rest
           python email/send.py

@@ -3,10 +3,10 @@ import os
 from mailjet_rest import Client
 
 
-MAILJET_USER = os.environ.get("MAILJET_USER")
-MAILJET_CREDENTIAL = os.environ.get("MAILJET_CREDENTIAL")
+MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
+MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
 
-mailjet_client = Client(auth=(MAILJET_USER, MAILJET_CREDENTIAL), version='v3.1')
+mailjet_client = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version='v3.1')
 
 
 with open("plot/img/monthly-expense-2021-07.png", "rb") as image_file:
