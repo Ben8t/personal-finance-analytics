@@ -1,0 +1,46 @@
+name: Send reminder
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 2,20 * *"
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    name: Build Docker image, download data, run scripts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create ./data directory
+        run: |
+          mkdir -p data
+      
+      - name: Download Data
+        env:
+            NOTION_API_SECRET: ${{ secrets.NOTION_API_SECRET }}
+        uses: ./ # using private root action
+        with:
+          script: 'download_data.R'
+      
+      - name: Create Monthly Expense plot
+        uses: ./  # using private root action
+        with:
+          script: 'plot/R/monthly_expense.R'
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Send email
+        env:
+          MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
+          MAILJET_API_SECRET: ${{ secrets.MAILJET_API_SECRET }}
+        run: |
+          pip install mailjet_rest==1.3.4
+          pip install Jinja2==3.0.1
+          python email/send.py --reminder

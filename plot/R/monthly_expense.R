@@ -1,4 +1,5 @@
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(readr)
 library(lubridate)
 library(ggdist)
@@ -6,15 +7,17 @@ library(cowplot)
 library(ggtext)
 library(glue)
 
+
 source(file="plot/R/theme.R")
+source(file="plot/R/date.R")
 
 data <- read_csv("data/data.csv") %>%
-    mutate(Month=month(dmy(Date), label=TRUE), Year=year(dmy(Date)), YearMonth=format(dmy(Date), "%Y-%m")) %>%
+    mutate(Month=month(ymd(Date), label=TRUE), Year=year(ymd(Date)), YearMonth=format(ymd(Date), "%Y-%m")) %>%
     filter(Tag1 != "COMPTE") %>%
-    filter(Price > -5000)
+    filter(Price > -4000)
 
 
-FILTER_MONTH <- "2021-05"
+FILTER_MONTH <- find_last_month_year()
 PARSED_FILTER_DATE <- parse_date_time(FILTER_MONTH, "ym")
 FILTER_MONTH_LABEL <- glue("{month(ymd(PARSED_FILTER_DATE), label=TRUE, abbr=FALSE)} {year(ymd(PARSED_FILTER_DATE))}")
 
@@ -61,4 +64,5 @@ legend_plot <- ggplot(legend_data) +
     theme(legend.position="none")
 
 main_plot <- ggdraw() + draw_plot(expense_plot) + draw_plot(legend_plot, x=0.08, y=-0.1, width=0.2)
-main_plot + ggsave(glue("plot/img/monthly-expense-{FILTER_MONTH}.png"), bg="white", width=32, height=25, units="cm", dpi=300)
+file_plot_name <- glue("plot/img/monthly-expense-{FILTER_MONTH}.png")
+main_plot + ggsave(file_plot_name, bg="white", width=32, height=25, units="cm", dpi=300)
