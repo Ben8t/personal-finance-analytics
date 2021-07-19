@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     if args.reminder:
         template = read_template("email/reminder.html")
-        rendered_template = template.render(user_name, date_title, quote)
+        rendered_template = template.render(user_name=user_name, date_title=date_title, quote=quote)
         subject = f"Personal Finance Analytics - Reminder {date_title}"
         data = {
             "Messages": [
