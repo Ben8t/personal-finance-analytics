@@ -1,13 +1,11 @@
-name: Build & Tests
+name: Send reminder
 
 on:
   push:
     branches:
       - main
-      - develop
-    pull_request:
-      branches:
-        - develop
+  schedule:
+    - cron: "0 0 2,20 * *"
 
 jobs:
   main:
@@ -38,11 +36,11 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Send mail
+      - name: Send email
         env:
           MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
           MAILJET_API_SECRET: ${{ secrets.MAILJET_API_SECRET }}
         run: |
           pip install mailjet_rest==1.3.4
           pip install Jinja2==3.0.1
-          python email/send.py
+          python email/send.py --reminder
