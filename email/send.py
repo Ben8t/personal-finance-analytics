@@ -1,6 +1,7 @@
 import argparse
 import base64
 import datetime
+from dateutil.relativedelta import relativedelta
 import logging
 import os
 import random
@@ -29,7 +30,8 @@ if __name__ == "__main__":
     mailjet_client = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version='v3.1')
 
     date = datetime.datetime.today()
-    month_year_date = date.strftime("%Y-%m")
+    date_minus_one_month = date - relativedelta(months=1)
+    month_year_date = date_minus_one_month.strftime("%Y-%m")
 
     quotes = ["I'm not in the casino industry, but I am in the fire service: Casinos pump an extra 1% of oxygen into the air to make you more alert and give you more energy. You stay longer and spend more money. It's also why casino fires are so catastrophic.", "A problem that can be solved with money is not really a problem.", "To be wealthy, accumulate all those things that money can’t buy.", "Don’t create things to make money; make money so you can create things. The reward for good work is more work.", "“What do you do with your money?” My answer at the time was “Nothing, really.” Okay, so why try so hard to earn lots more of it?"]
 
