@@ -43,4 +43,5 @@ jobs:
         run: |
           pip install mailjet_rest==1.3.4
           pip install Jinja2==3.0.1
+          pip install python-dateutil==2.8.2
           python email/send.py --reminder
