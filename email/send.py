@@ -38,7 +38,7 @@ if __name__ == "__main__":
     user_name = "Benoit"
     user_email = "pimpaudben@gmail.com"
     quote = random.choice(quotes)
-    date_title = date.strftime("%B %Y")
+    date_title = date_minus_one_month.strftime("%B %Y")
 
     if args.reminder:
         template = read_template("email/reminder.html")
